@@ -1,193 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>H1CL Oral Revision Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
-body{font-family:var(--font-sans);user-select:none;-webkit-user-select:none;}
-.shell{min-height:520px;display:flex;flex-direction:column;}
-.card-wrap{flex:1;display:flex;flex-direction:column;border-radius:var(--border-radius-lg);overflow:hidden;min-height:520px;}
-.card-top{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
-.topic-label{font-size:11px;font-weight:500;letter-spacing:0.03em;opacity:0.85;}
-.top-right{display:flex;align-items:center;gap:10px;}
-.counter{font-size:11px;opacity:0.7;}
-.sound-btn{background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center;opacity:0.8;border-radius:4px;}
-.sound-btn:hover{opacity:1;}
-.sound-btn svg{width:20px;height:20px;}
-.hint-bar{font-size:11px;text-align:center;padding:4px 0 8px;opacity:0.65;letter-spacing:0.02em;}
-.card-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 24px 16px;cursor:pointer;min-height:320px;}
-.face-front{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
-.face-back{display:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;width:100%;}
-.word-zh{font-size:56px;font-weight:500;line-height:1.1;text-align:center;margin-bottom:8px;}
-.word-zh-back{font-size:44px;font-weight:500;text-align:left;margin-bottom:6px;}
-.tap-hint{font-size:12px;opacity:0.5;margin-top:16px;display:flex;align-items:center;gap:5px;}
-.pinyin{font-size:18px;margin-bottom:6px;opacity:0.75;}
-.def-en{font-size:13px;opacity:0.6;margin-bottom:10px;}
-.def-zh{font-size:17px;font-weight:500;margin-bottom:14px;}
-.collocations-label{font-size:11px;opacity:0.6;margin-bottom:6px;letter-spacing:0.05em;text-transform:uppercase;}
-.collocation-item{font-size:15px;line-height:1.9;width:100%;}
-.collocation-item b{font-weight:500;text-decoration:underline;text-underline-offset:3px;}
-.divider{width:100%;height:0.5px;opacity:0.2;margin:10px 0 12px;}
-.nav-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;}
-.nav-btn{background:none;border:none;cursor:pointer;padding:8px;border-radius:var(--border-radius-md);display:flex;align-items:center;gap:4px;font-size:13px;opacity:0.7;}
-.nav-btn:hover{opacity:1;background:rgba(0,0,0,0.06);}
-.nav-btn svg{width:18px;height:18px;}
-.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:200px;}
-</style>
+        /* 玻璃拟态卡片容器 */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
 
-<h2 class="sr-only">H1 CL 口试词汇闪卡：科技对传统事物的影响（电子书 vs 纸质书）</h2>
+        /* 翻转逻辑 */
+        .card-container {
+            perspective: 1000px;
+            width: 90vw;
+            max-width: 400px;
+            height: 60vh;
+            max-height: 600px;
+            margin: auto;
+        }
 
-<div class="shell">
-  <div class="card-wrap" id="cardWrap">
-    <div class="card-top">
-      <span class="topic-label" id="topicLabel">科技对传统事物的影响</span>
-      <div class="top-right">
-        <span class="counter" id="counter">1 / 16</span>
-        <button class="sound-btn" id="soundBtn" onclick="speak()" aria-label="播放发音">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div class="hint-bar" id="hintBar">Tap to reveal · Swipe or use ← → to navigate</div>
-    <div class="card-body" id="cardBody" onclick="flipCard()">
-      <div class="face-front" id="faceFront">
-        <div class="word-zh" id="wordZhFront"></div>
-        <div class="tap-hint" id="tapHint">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          tap to see details
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* 内容溢出处理 */
+        .content-scroll {
+            flex-1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .content-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        /* 字体大小控制 */
+        .word-text {
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .highlight {
+            color: #34d399;
+            font-weight: bold;
+            border-bottom: 2px solid #34d399;
+        }
+
+        /* 手机适配 */
+        @media (max-height: 700px) {
+            .card-container { height: 75vh; }
+            .word-text { font-size: clamp(2rem, 8vw, 3rem); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部信息 -->
+    <header class="p-4 text-center">
+        <p class="text-[10px] tracking-[0.3em] text-emerald-400 font-bold uppercase">Topic: Technology vs Tradition</p>
+        <h1 class="text-lg font-bold">科技对传统事物的影响</h1>
+        <div id="counter" class="text-xs text-slate-500 mt-1 font-mono">01 / 20</div>
+    </header>
+
+    <!-- 进度条 -->
+    <div class="px-6 mb-2">
+        <div class="h-1 bg-slate-800 rounded-full w-full max-w-md mx-auto overflow-hidden">
+            <div id="progress" class="h-full bg-emerald-500 transition-all duration-300" style="width: 5%"></div>
         </div>
-      </div>
-      <div class="face-back" id="faceBack">
-        <div class="word-zh-back" id="wordZhBack"></div>
-        <div class="pinyin" id="pinyin"></div>
-        <div class="def-en" id="defEn"></div>
-        <hr class="divider" id="divider">
-        <div class="def-zh" id="defZh"></div>
-        <div class="collocations-label">搭配 / 例句</div>
-        <div class="collocation-item" id="collocations"></div>
-      </div>
     </div>
-    <div class="nav-row">
-      <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" aria-label="上一张">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-        Prev
-      </button>
-      <div class="dots" id="dots"></div>
-      <button class="nav-btn" id="nextBtn" onclick="navigate(1)" aria-label="下一张">
-        Next
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
+
+    <!-- 提示语 -->
+    <div class="text-center text-[9px] text-slate-500 uppercase tracking-widest mb-2 px-4">
+        <span class="md:hidden">Swipe Left/Right to Navigate • Tap to Flip</span>
+        <span class="hidden md:inline">Use Arrows/Space to Navigate • Click to Flip</span>
     </div>
-  </div>
-</div>
 
-<script>
-const palette=[
-  {bg:'#E6F1FB',text:'#0C447C',sub:'#185FA5',dot:'#378ADD'},
-  {bg:'#E1F5EE',text:'#085041',sub:'#0F6E56',dot:'#1D9E75'},
-  {bg:'#EEEDFE',text:'#3C3489',sub:'#534AB7',dot:'#7F77DD'},
-  {bg:'#FAECE7',text:'#712B13',sub:'#993C1D',dot:'#D85A30'},
-  {bg:'#EAF3DE',text:'#27500A',sub:'#3B6D11',dot:'#639922'},
-  {bg:'#FAEEDA',text:'#633806',sub:'#854F0B',dot:'#BA7517'},
-  {bg:'#FBEAF0',text:'#72243E',sub:'#993556',dot:'#D4537E'},
-  {bg:'#E6F1FB',text:'#0C447C',sub:'#185FA5',dot:'#378ADD'},
-];
+    <!-- 闪卡主体 -->
+    <div class="card-container" id="main-container">
+        <div class="card-inner" id="card-inner">
+            
+            <!-- 正面：词语和拼音 -->
+            <div class="card-front glass-card flex flex-col justify-between" onclick="toggleFlip()">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase">Vocab</span>
+                    <button onclick="speakWord(event)" class="w-8 h-8 flex items-center justify-center bg-emerald-500/20 text-emerald-400 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H3a1 1 0 01-1-1V8a1 1 0 011-1h1.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex-1 flex flex-col justify-center items-center text-center py-4">
+                    <div id="pinyin-text" class="text-emerald-400 font-serif text-lg mb-2">táo tài</div>
+                    <div id="word-text" class="word-text font-black text-white px-2">淘汰</div>
+                </div>
+                <div class="text-center text-[10px] text-slate-600 font-bold uppercase py-2">Click to View Details</div>
+            </div>
 
-const cards=[
-  {word:'淘汰',pinyin:'táotài',en:'to be eliminated / phased out',zh:'被取代，不再使用',collocations:'随着科技发展，传统纸质书逐渐遭到<b>淘汰</b>。\n市场<b>淘汰</b>了落后的产品。'},
-  {word:'并存',pinyin:'bìngcún',en:'to coexist / exist side by side',zh:'两者同时存在',collocations:'电子书与纸质书可以长期<b>并存</b>，各有各的读者群。\n传统与现代<b>并存</b>。'},
-  {word:'普及',pinyin:'pǔjí',en:'to become widespread / popularize',zh:'广泛流传，被大众接受',collocations:'智能手机的<b>普及</b>推动了电子阅读的发展。\n知识<b>普及</b>到每一个角落。'},
-  {word:'趋势',pinyin:'qūshì',en:'trend / tendency',zh:'事物发展的方向',collocations:'数字化阅读已成为不可逆转的<b>趋势</b>。\n这是时代的<b>趋势</b>。'},
-  {word:'携带',pinyin:'xiédài',en:'to carry / to bring along',zh:'随身带着',collocations:'电子书方便<b>携带</b>，一部手机可储存数千本书。\n轻便易<b>携带</b>。'},
-  {word:'没落',pinyin:'mòluò',en:'to decline / fall into obscurity',zh:'逐渐衰退，失去影响力',collocations:'实体书店日渐<b>没落</b>，许多店面被迫关闭。\n传统行业走向<b>没落</b>。'},
-  {word:'可持续',pinyin:'kě chí xù',en:'sustainable',zh:'不破坏资源，能长期维持',collocations:'减少用纸有助于推动更<b>可持续</b>的生活方式。\n<b>可持续</b>发展是未来的关键。'},
-  {word:'流行',pinyin:'liúxíng',en:'popular / in vogue',zh:'广受欢迎，受大众喜爱',collocations:'电子阅读在年轻人中越来越<b>流行</b>。\n<b>流行</b>文化影响着一代人。'},
-  {word:'阅读疲劳',pinyin:'yuèdú píláo',en:'reading fatigue / eye strain',zh:'长时间看屏幕导致眼睛疲劳',collocations:'长时间使用电子设备容易造成<b>阅读疲劳</b>。\n<b>阅读疲劳</b>影响学习效率。'},
-  {word:'依赖',pinyin:'yīlài',en:'to rely on / dependence',zh:'过度需要某事物，难以独立',collocations:'过度<b>依赖</b>电子设备会削弱专注力。\n我们不能太<b>依赖</b>科技。'},
-  {word:'网络资源',pinyin:'wǎngluò zīyuán',en:'online resources',zh:'互联网上可获取的学习或阅读材料',collocations:'学生可通过<b>网络资源</b>免费获取大量书籍。\n<b>网络资源</b>丰富，但需要筛选。'},
-  {word:'下载',pinyin:'xiàzài',en:'to download',zh:'从网络上取得文件或内容',collocations:'只需几秒钟就能<b>下载</b>一本电子书。\n免费<b>下载</b>教育资料。'},
-  {word:'阅读习惯',pinyin:'yuèdú xíguàn',en:'reading habits',zh:'一个人固定的阅读方式或偏好',collocations:'电子书改变了许多人的<b>阅读习惯</b>。\n培养良好的<b>阅读习惯</b>很重要。'},
-  {word:'冲击',pinyin:'chōngjī',en:'to impact / disrupt',zh:'对现有事物造成强烈影响',collocations:'电子书的兴起对传统出版业造成了巨大<b>冲击</b>。\n科技<b>冲击</b>传统行业。'},
-  {word:'便捷',pinyin:'biànjié',en:'convenient / handy',zh:'方便快捷，省时省力',collocations:'电子书最大的优势是<b>便捷</b>，随时随地都能阅读。\n科技让生活更<b>便捷</b>。'},
-  {word:'随时随地',pinyin:'suíshí suídì',en:'anytime, anywhere',zh:'不受时间和地点限制',collocations:'有了电子书，读者可以<b>随时随地</b>享受阅读。\n<b>随时随地</b>获取信息。'},
-];
+            <!-- 背面：解释和搭配 -->
+            <div class="card-back glass-card flex flex-col" onclick="toggleFlip()">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="word-back-title" class="font-bold text-emerald-400">淘汰</span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase">Explanation</span>
+                </div>
+                
+                <div class="content-scroll flex-1 space-y-4 text-left">
+                    <div>
+                        <h4 class="text-[9px] font-bold text-slate-500 uppercase mb-1">Meaning / 解释</h4>
+                        <p id="zh-meaning" class="text-base text-slate-200 leading-snug"></p>
+                        <p id="en-meaning" class="text-xs text-slate-400 italic mt-1"></p>
+                    </div>
 
-let idx=0,flipped=false;
-function getCol(i){return palette[i%palette.length];}
+                    <div>
+                        <h4 class="text-[9px] font-bold text-slate-500 uppercase mb-1">Collocation / 搭配</h4>
+                        <p id="collocation" class="text-sm text-emerald-100 bg-emerald-900/30 p-2 rounded-lg border border-emerald-500/20"></p>
+                    </div>
 
-function render(){
-  const c=cards[idx];
-  const col=getCol(idx);
-  document.getElementById('cardWrap').style.background=col.bg;
-  ['topicLabel','counter','hintBar'].forEach(id=>document.getElementById(id).style.color=col.sub);
-  document.getElementById('soundBtn').style.color=col.text;
-  document.getElementById('tapHint').style.color=col.sub;
-  document.getElementById('wordZhFront').style.color=col.text;
-  document.getElementById('wordZhFront').textContent=c.word;
-  document.getElementById('wordZhBack').style.color=col.text;
-  document.getElementById('wordZhBack').textContent=c.word;
-  document.getElementById('pinyin').style.color=col.sub;
-  document.getElementById('pinyin').textContent=c.pinyin;
-  document.getElementById('defEn').style.color=col.sub;
-  document.getElementById('defEn').textContent=c.en;
-  document.getElementById('divider').style.background=col.text;
-  document.getElementById('defZh').style.color=col.text;
-  document.getElementById('defZh').textContent=c.zh;
-  const collEl=document.getElementById('collocations');
-  collEl.style.color=col.text;
-  collEl.innerHTML=c.collocations.replace(/\n/g,'<br>');
-  collEl.querySelectorAll('b').forEach(b=>{b.style.color=col.text;b.style.fontWeight='500';});
-  document.getElementById('counter').textContent=(idx+1)+' / '+cards.length;
-  document.querySelectorAll('.nav-btn').forEach(b=>b.style.color=col.sub);
-  document.querySelector('.collocations-label').style.color=col.sub;
-  renderDots(col);
-  showFront();
-}
+                    <div class="pb-4">
+                        <h4 class="text-[9px] font-bold text-slate-500 uppercase mb-1">Example / 例句</h4>
+                        <p id="example-sentence" class="text-sm text-slate-300 leading-relaxed"></p>
+                    </div>
+                </div>
+                <div class="text-center text-[9px] text-slate-600 font-bold uppercase pt-2 border-t border-white/5">Tap to return</div>
+            </div>
 
-function showFront(){
-  document.getElementById('faceFront').style.display='flex';
-  document.getElementById('faceBack').style.display='none';
-  flipped=false;
-}
-function showBack(){
-  document.getElementById('faceFront').style.display='none';
-  document.getElementById('faceBack').style.display='flex';
-  flipped=true;
-}
-function flipCard(){flipped?showFront():showBack();}
-function navigate(dir){idx=(idx+dir+cards.length)%cards.length;render();}
+        </div>
+    </div>
 
-function speak(){
-  if('speechSynthesis' in window){
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(cards[idx].word);
-    u.lang='zh-CN';u.rate=0.85;
-    window.speechSynthesis.speak(u);
-  }
-}
+    <!-- 底部导航 -->
+    <footer class="p-6 flex justify-between items-center max-w-md mx-auto w-full">
+        <button onclick="changeCard(-1)" class="w-12 h-12 flex items-center justify-center rounded-full border border-slate-800 text-slate-400 hover:border-emerald-500 hover:text-white transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        
+        <div class="text-[10px] font-bold text-slate-700 uppercase tracking-widest">H1CL Revision</div>
 
-function renderDots(col){
-  document.getElementById('dots').innerHTML=cards.map((_,i)=>
-    `<div style="width:6px;height:6px;border-radius:50%;background:${i===idx?col.dot:col.sub};opacity:${i===idx?1:0.25}"></div>`
-  ).join('');
-}
+        <button onclick="changeCard(1)" class="w-12 h-12 flex items-center justify-center rounded-full border border-slate-800 text-slate-400 hover:border-emerald-500 hover:text-white transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+    </footer>
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight')navigate(1);
-  else if(e.key==='ArrowLeft')navigate(-1);
-  else if(e.key===' '||e.key==='Enter'){e.preventDefault();flipCard();}
-});
+    <script>
+        const cards = [
+            { word: "淘汰", pinyin: "táo tài", zh: "在竞争中去掉差的、不合适的。", en: "To eliminate through competition.", coll: "被时代淘汰 / 逐步淘汰", ex: "如果不跟上科技的步伐，传统行业很容易被时代{淘汰}。" },
+            { word: "并存", pinyin: "bìng cún", zh: "同时存在。", en: "Coexist.", coll: "长期并存 / 多元并存", ex: "在未来的很长一段时间里，电子书与纸质书将会长期{并存}。" },
+            { word: "普及", pinyin: "pǔ jí", zh: "普遍推广，使大众化。", en: "Popularize / Universal.", coll: "广泛普及 / 电脑普及", ex: "随着智能手机的{普及}，数字化阅读已成为一种生活方式。" },
+            { word: "趋势", pinyin: "qū shì", zh: "事物发展的方向。", en: "Trend / Tendency.", coll: "必然趋势 / 发展趋势", ex: "无纸化办公和阅读是未来发展的必然{趋势}。" },
+            { word: "携带", pinyin: "xié dài", zh: "随身带着。", en: "Carry / Portable.", coll: "携带方便 / 随身携带", ex: "电子书的一大优点是轻便，非常适合外出时{携带}。" },
+            { word: "没落", pinyin: "mò luò", zh: "衰败；趋向灭亡。", en: "Decline / Fade away.", coll: "走向没落 / 行业没落", ex: "新事物的出现并不代表传统书籍的{没落}。" },
+            { word: "可持续", pinyin: "kě chí xù", zh: "可以继续维持下去。", en: "Sustainable.", coll: "可持续发展 / 可持续资源", ex: "减少纸张消耗符合环保与{可持续}发展的理念。" },
+            { word: "流行", pinyin: "liú xíng", zh: "广泛传播；盛行。", en: "Popular / Trendy.", coll: "广泛流行 / 流行趋势", ex: "有声书是近几年来非常{流行}的新型阅读选择。" },
+            { word: "阅读疲劳", pinyin: "yuè dú pí láo", zh: "因长时间阅读导致的眼睛或精神疲倦。", en: "Reading fatigue.", coll: "产生阅读疲劳 / 造成疲劳", ex: "长时间盯着屏幕阅读容易产生电子屏幕引起的{阅读疲劳}。" },
+            { word: "依赖", pinyin: "yī lài", zh: "依靠某物而不能自立。", en: "Depend on / Rely on.", coll: "过度依赖 / 产生依赖", ex: "现代人过于{依赖}电子设备，有时会忽略了写字的乐趣。" },
+            { word: "网络资源", pinyin: "wǎng luò zī yuán", zh: "网络上的各类信息和数据。", en: "Online resources.", coll: "丰富的网络资源 / 共享资源", ex: "我们可以利用丰富的{网络资源}来进行深度学习。" },
+            { word: "下载", pinyin: "xià zǎi", zh: "从互联网接收文件到设备。", en: "Download.", coll: "免费下载 / 在线下载", ex: "读者只需几秒钟就能{下载}到自己心仪的图书。" },
+            { word: "阅读习惯", pinyin: "yuè dú xí guàn", zh: "长期养成的阅读方式。", en: "Reading habits.", coll: "养成阅读习惯 / 改变习惯", ex: "数字科技正在潜移默化地改变着年轻一代的{阅读习惯}。" },
+            { word: "冲击", pinyin: "chōng jī", zh: "强大的力量带来的影响。", en: "Impact / Shock.", coll: "带来巨大冲击 / 面临冲击", ex: "电商平台对传统书店带来了前所未有的巨大{冲击}。" },
+            { word: "便捷", pinyin: "biàn jié", zh: "快而方便。", en: "Convenient.", coll: "操作便捷 / 生活便捷", ex: "电子支付和数字阅读让我们的生活变得更加{便捷}。" },
+            { word: "随时随地", pinyin: "suí shí suí dì", zh: "任何时间、任何地点。", en: "Anytime, anywhere.", coll: "随时随地学习 / 随时随地阅读", ex: "移动终端让我们能够{随时随地}获取最新的新闻资讯。" },
+            { word: "专注力", pinyin: "zhuān zhù lì", zh: "一心一意、集中精神的能力。", en: "Concentration / Focus.", coll: "培养专注力 / 分散专注力", ex: "纸质书更能让人沉浸其中，提高阅读的{专注力}。" },
+            { word: "辅助功能", pinyin: "fǔ zhù gōng néng", zh: "起辅助作用的功能。", en: "Auxiliary functions.", coll: "提供辅助功能 / 实用功能", ex: "电子书内置的字典和搜索等{辅助功能}非常实用。" },
+            { word: "情怀", pinyin: "qíng huái", zh: "拥有的某种感情或心境。", en: "Sentiment / Feelings.", coll: "怀旧情怀 / 书卷情怀", ex: "对于老一辈读者来说，墨香是一种难以取代的{情怀}。" },
+            { word: "收藏价值", pinyin: "shōu cáng jià zhí", zh: "值得收集和保存的价值。", en: "Collection value.", coll: "具有收藏价值 / 提升价值", ex: "一些精装版书籍不仅可以阅读，还具有很高的{收藏价值}。" }
+        ];
 
-let startX=0;
-const body=document.getElementById('cardBody');
-body.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
-body.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-startX;
-  if(Math.abs(dx)>40)navigate(dx<0?1:-1);
-  else flipCard();
-},{passive:true});
+        let index = 0;
+        let startTouchX = 0;
 
-render();
-</script>
+        function updateCard() {
+            const data = cards[index];
+            const inner = document.getElementById('card-inner');
+            inner.classList.remove('is-flipped'); // 切换时重置为正面
+            
+            // 正面内容
+            document.getElementById('word-text').innerText = data.word;
+            document.getElementById('pinyin-text').innerText = data.pinyin;
+            
+            // 背面内容
+            document.getElementById('word-back-title').innerText = data.word;
+            document.getElementById('zh-meaning').innerText = data.zh;
+            document.getElementById('en-meaning').innerText = data.en;
+            document.getElementById('collocation').innerText = data.coll;
+            
+            // 例句高亮处理
+            const exHtml = data.ex.replace(`{${data.word}}`, `<span class="highlight">${data.word}</span>`);
+            document.getElementById('example-sentence').innerHTML = exHtml;
+
+            // 进度
+            document.getElementById('counter').innerText = `${(index + 1).toString().padStart(2, '0')} / ${cards.length}`;
+            document.getElementById('progress').style.width = `${((index + 1) / cards.length) * 100}%`;
+        }
+
+        function toggleFlip() {
+            document.getElementById('card-inner').classList.toggle('is-flipped');
+        }
+
+        function changeCard(step) {
+            index = (index + step + cards.length) % cards.length;
+            updateCard();
+        }
+
+        function speakWord(e) {
+            e.stopPropagation();
+            const speech = new SpeechSynthesisUtterance(cards[index].word);
+            speech.lang = 'zh-CN';
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(speech);
+        }
+
+        // 手势支持
+        const container = document.getElementById('main-container');
+        container.addEventListener('touchstart', e => startTouchX = e.touches[0].clientX, {passive: true});
+        container.addEventListener('touchend', e => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startTouchX - endX;
+            if (Math.abs(diff) > 50) {
+                changeCard(diff > 0 ? 1 : -1);
+            }
+        });
+
+        // 键盘支持
+        window.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') changeCard(1);
+            if (e.key === 'ArrowLeft') changeCard(-1);
+            if (e.code === 'Space') { e.preventDefault(); toggleFlip(); }
+        });
+
+        updateCard();
+    </script>
+</body>
+</html>
