@@ -1,0 +1,193 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+body{font-family:var(--font-sans);user-select:none;-webkit-user-select:none;}
+.shell{min-height:520px;display:flex;flex-direction:column;}
+.card-wrap{flex:1;display:flex;flex-direction:column;border-radius:var(--border-radius-lg);overflow:hidden;min-height:520px;}
+.card-top{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
+.topic-label{font-size:11px;font-weight:500;letter-spacing:0.03em;opacity:0.85;}
+.top-right{display:flex;align-items:center;gap:10px;}
+.counter{font-size:11px;opacity:0.7;}
+.sound-btn{background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;justify-content:center;opacity:0.8;border-radius:4px;}
+.sound-btn:hover{opacity:1;}
+.sound-btn svg{width:20px;height:20px;}
+.hint-bar{font-size:11px;text-align:center;padding:4px 0 8px;opacity:0.65;letter-spacing:0.02em;}
+.card-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 24px 16px;cursor:pointer;min-height:320px;}
+.face-front{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;}
+.face-back{display:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;width:100%;}
+.word-zh{font-size:56px;font-weight:500;line-height:1.1;text-align:center;margin-bottom:8px;}
+.word-zh-back{font-size:44px;font-weight:500;text-align:left;margin-bottom:6px;}
+.tap-hint{font-size:12px;opacity:0.5;margin-top:16px;display:flex;align-items:center;gap:5px;}
+.pinyin{font-size:18px;margin-bottom:6px;opacity:0.75;}
+.def-en{font-size:13px;opacity:0.6;margin-bottom:10px;}
+.def-zh{font-size:17px;font-weight:500;margin-bottom:14px;}
+.collocations-label{font-size:11px;opacity:0.6;margin-bottom:6px;letter-spacing:0.05em;text-transform:uppercase;}
+.collocation-item{font-size:15px;line-height:1.9;width:100%;}
+.collocation-item b{font-weight:500;text-decoration:underline;text-underline-offset:3px;}
+.divider{width:100%;height:0.5px;opacity:0.2;margin:10px 0 12px;}
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 14px;}
+.nav-btn{background:none;border:none;cursor:pointer;padding:8px;border-radius:var(--border-radius-md);display:flex;align-items:center;gap:4px;font-size:13px;opacity:0.7;}
+.nav-btn:hover{opacity:1;background:rgba(0,0,0,0.06);}
+.nav-btn svg{width:18px;height:18px;}
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:200px;}
+</style>
+
+<h2 class="sr-only">H1 CL 口试词汇闪卡：科技对传统事物的影响（电子书 vs 纸质书）</h2>
+
+<div class="shell">
+  <div class="card-wrap" id="cardWrap">
+    <div class="card-top">
+      <span class="topic-label" id="topicLabel">科技对传统事物的影响</span>
+      <div class="top-right">
+        <span class="counter" id="counter">1 / 16</span>
+        <button class="sound-btn" id="soundBtn" onclick="speak()" aria-label="播放发音">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="hint-bar" id="hintBar">Tap to reveal · Swipe or use ← → to navigate</div>
+    <div class="card-body" id="cardBody" onclick="flipCard()">
+      <div class="face-front" id="faceFront">
+        <div class="word-zh" id="wordZhFront"></div>
+        <div class="tap-hint" id="tapHint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          tap to see details
+        </div>
+      </div>
+      <div class="face-back" id="faceBack">
+        <div class="word-zh-back" id="wordZhBack"></div>
+        <div class="pinyin" id="pinyin"></div>
+        <div class="def-en" id="defEn"></div>
+        <hr class="divider" id="divider">
+        <div class="def-zh" id="defZh"></div>
+        <div class="collocations-label">搭配 / 例句</div>
+        <div class="collocation-item" id="collocations"></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" aria-label="上一张">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Prev
+      </button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn" id="nextBtn" onclick="navigate(1)" aria-label="下一张">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const palette=[
+  {bg:'#E6F1FB',text:'#0C447C',sub:'#185FA5',dot:'#378ADD'},
+  {bg:'#E1F5EE',text:'#085041',sub:'#0F6E56',dot:'#1D9E75'},
+  {bg:'#EEEDFE',text:'#3C3489',sub:'#534AB7',dot:'#7F77DD'},
+  {bg:'#FAECE7',text:'#712B13',sub:'#993C1D',dot:'#D85A30'},
+  {bg:'#EAF3DE',text:'#27500A',sub:'#3B6D11',dot:'#639922'},
+  {bg:'#FAEEDA',text:'#633806',sub:'#854F0B',dot:'#BA7517'},
+  {bg:'#FBEAF0',text:'#72243E',sub:'#993556',dot:'#D4537E'},
+  {bg:'#E6F1FB',text:'#0C447C',sub:'#185FA5',dot:'#378ADD'},
+];
+
+const cards=[
+  {word:'淘汰',pinyin:'táotài',en:'to be eliminated / phased out',zh:'被取代，不再使用',collocations:'随着科技发展，传统纸质书逐渐遭到<b>淘汰</b>。\n市场<b>淘汰</b>了落后的产品。'},
+  {word:'并存',pinyin:'bìngcún',en:'to coexist / exist side by side',zh:'两者同时存在',collocations:'电子书与纸质书可以长期<b>并存</b>，各有各的读者群。\n传统与现代<b>并存</b>。'},
+  {word:'普及',pinyin:'pǔjí',en:'to become widespread / popularize',zh:'广泛流传，被大众接受',collocations:'智能手机的<b>普及</b>推动了电子阅读的发展。\n知识<b>普及</b>到每一个角落。'},
+  {word:'趋势',pinyin:'qūshì',en:'trend / tendency',zh:'事物发展的方向',collocations:'数字化阅读已成为不可逆转的<b>趋势</b>。\n这是时代的<b>趋势</b>。'},
+  {word:'携带',pinyin:'xiédài',en:'to carry / to bring along',zh:'随身带着',collocations:'电子书方便<b>携带</b>，一部手机可储存数千本书。\n轻便易<b>携带</b>。'},
+  {word:'没落',pinyin:'mòluò',en:'to decline / fall into obscurity',zh:'逐渐衰退，失去影响力',collocations:'实体书店日渐<b>没落</b>，许多店面被迫关闭。\n传统行业走向<b>没落</b>。'},
+  {word:'可持续',pinyin:'kě chí xù',en:'sustainable',zh:'不破坏资源，能长期维持',collocations:'减少用纸有助于推动更<b>可持续</b>的生活方式。\n<b>可持续</b>发展是未来的关键。'},
+  {word:'流行',pinyin:'liúxíng',en:'popular / in vogue',zh:'广受欢迎，受大众喜爱',collocations:'电子阅读在年轻人中越来越<b>流行</b>。\n<b>流行</b>文化影响着一代人。'},
+  {word:'阅读疲劳',pinyin:'yuèdú píláo',en:'reading fatigue / eye strain',zh:'长时间看屏幕导致眼睛疲劳',collocations:'长时间使用电子设备容易造成<b>阅读疲劳</b>。\n<b>阅读疲劳</b>影响学习效率。'},
+  {word:'依赖',pinyin:'yīlài',en:'to rely on / dependence',zh:'过度需要某事物，难以独立',collocations:'过度<b>依赖</b>电子设备会削弱专注力。\n我们不能太<b>依赖</b>科技。'},
+  {word:'网络资源',pinyin:'wǎngluò zīyuán',en:'online resources',zh:'互联网上可获取的学习或阅读材料',collocations:'学生可通过<b>网络资源</b>免费获取大量书籍。\n<b>网络资源</b>丰富，但需要筛选。'},
+  {word:'下载',pinyin:'xiàzài',en:'to download',zh:'从网络上取得文件或内容',collocations:'只需几秒钟就能<b>下载</b>一本电子书。\n免费<b>下载</b>教育资料。'},
+  {word:'阅读习惯',pinyin:'yuèdú xíguàn',en:'reading habits',zh:'一个人固定的阅读方式或偏好',collocations:'电子书改变了许多人的<b>阅读习惯</b>。\n培养良好的<b>阅读习惯</b>很重要。'},
+  {word:'冲击',pinyin:'chōngjī',en:'to impact / disrupt',zh:'对现有事物造成强烈影响',collocations:'电子书的兴起对传统出版业造成了巨大<b>冲击</b>。\n科技<b>冲击</b>传统行业。'},
+  {word:'便捷',pinyin:'biànjié',en:'convenient / handy',zh:'方便快捷，省时省力',collocations:'电子书最大的优势是<b>便捷</b>，随时随地都能阅读。\n科技让生活更<b>便捷</b>。'},
+  {word:'随时随地',pinyin:'suíshí suídì',en:'anytime, anywhere',zh:'不受时间和地点限制',collocations:'有了电子书，读者可以<b>随时随地</b>享受阅读。\n<b>随时随地</b>获取信息。'},
+];
+
+let idx=0,flipped=false;
+function getCol(i){return palette[i%palette.length];}
+
+function render(){
+  const c=cards[idx];
+  const col=getCol(idx);
+  document.getElementById('cardWrap').style.background=col.bg;
+  ['topicLabel','counter','hintBar'].forEach(id=>document.getElementById(id).style.color=col.sub);
+  document.getElementById('soundBtn').style.color=col.text;
+  document.getElementById('tapHint').style.color=col.sub;
+  document.getElementById('wordZhFront').style.color=col.text;
+  document.getElementById('wordZhFront').textContent=c.word;
+  document.getElementById('wordZhBack').style.color=col.text;
+  document.getElementById('wordZhBack').textContent=c.word;
+  document.getElementById('pinyin').style.color=col.sub;
+  document.getElementById('pinyin').textContent=c.pinyin;
+  document.getElementById('defEn').style.color=col.sub;
+  document.getElementById('defEn').textContent=c.en;
+  document.getElementById('divider').style.background=col.text;
+  document.getElementById('defZh').style.color=col.text;
+  document.getElementById('defZh').textContent=c.zh;
+  const collEl=document.getElementById('collocations');
+  collEl.style.color=col.text;
+  collEl.innerHTML=c.collocations.replace(/\n/g,'<br>');
+  collEl.querySelectorAll('b').forEach(b=>{b.style.color=col.text;b.style.fontWeight='500';});
+  document.getElementById('counter').textContent=(idx+1)+' / '+cards.length;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.style.color=col.sub);
+  document.querySelector('.collocations-label').style.color=col.sub;
+  renderDots(col);
+  showFront();
+}
+
+function showFront(){
+  document.getElementById('faceFront').style.display='flex';
+  document.getElementById('faceBack').style.display='none';
+  flipped=false;
+}
+function showBack(){
+  document.getElementById('faceFront').style.display='none';
+  document.getElementById('faceBack').style.display='flex';
+  flipped=true;
+}
+function flipCard(){flipped?showFront():showBack();}
+function navigate(dir){idx=(idx+dir+cards.length)%cards.length;render();}
+
+function speak(){
+  if('speechSynthesis' in window){
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(cards[idx].word);
+    u.lang='zh-CN';u.rate=0.85;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+function renderDots(col){
+  document.getElementById('dots').innerHTML=cards.map((_,i)=>
+    `<div style="width:6px;height:6px;border-radius:50%;background:${i===idx?col.dot:col.sub};opacity:${i===idx?1:0.25}"></div>`
+  ).join('');
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')navigate(1);
+  else if(e.key==='ArrowLeft')navigate(-1);
+  else if(e.key===' '||e.key==='Enter'){e.preventDefault();flipCard();}
+});
+
+let startX=0;
+const body=document.getElementById('cardBody');
+body.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+body.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(Math.abs(dx)>40)navigate(dx<0?1:-1);
+  else flipCard();
+},{passive:true});
+
+render();
+</script>
